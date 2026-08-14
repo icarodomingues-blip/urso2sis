@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faunadex Arena</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .arena { 
+            background-color: #16213e; 
+            padding: 30px; 
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: 150px 450px 150px;
+            gap: 40px;
+        }
+
+        .mao-aliado, .mao-inimigo {
+            display: grid;
+            grid-template-rows: repeat(5, 1fr);
+            gap: 15px;
+            min-height: 500px;
+        }
+
+        .carta {
+            background-color: #0f3460;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: transparent;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            width: 100%;
+            height: 100%;
+        }
+
+        .carta:hover {
+            transform: scale(1.1);
+            border-color: #FFD700;
+        }
+
+        .carta.inimigo {
+            border-color: #e94560;
+        }
+
+        .segurando {
+            opacity: 0.5;
+            transform: scale(1.1);
+            border-color: #00ffff;
+        }
+
+        .tabuleiro {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); 
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            background-color: #0d1b2a;
+            border: 3px solid #e94560;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .slot {
+            background-color: #1b263b;
+            border: 1px solid #415a77;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .slot:hover {
+            background-color: #4CAF50;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="arena">
+        <div class="mao-aliado"></div>
+
+        <div class="tabuleiro">
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+            <div class="slot"></div>
+        </div>
+
+        <div class="mao-inimigo"></div>
+    </div>
+
+    <script>
+        const bancoDeCartasAliadas = [
+            { id: 1, nome: "Urso Alpha", forca: 8, img: "https://placebear.com/200/300" },
+            { id: 2, nome: "Urso Beta", forca: 9, img: "https://placebear.com/200/301" },
+            { id: 3, nome: "Urso Charlie", forca: 5, img: "https://placebear.com/200/302" },
+            { id: 4, nome: "Urso Delta", forca: 6, img: "https://placebear.com/200/303" },
+            { id: 5, nome: "Urso Echo", forca: 7, img: "https://placebear.com/200/304" }
+        ];
+
+        const bancoDeCartasInimigas = [
+            { id: 1, nome: "Urso Sombra", forca: 7, img: "https://placebear.com/200/305" },
+            { id: 2, nome: "Urso Feroz", forca: 8, img: "https://placebear.com/200/306" },
+            { id: 3, nome: "Urso Espectro", forca: 6, img: "https://placebear.com/200/307" },
+            { id: 4, nome: "Urso Titã", forca: 10, img: "https://placebear.com/200/308" },
+            { id: 5, nome: "Urso Noturno", forca: 5, img: "https://placebear.com/200/309" }
+        ];
+
+        const maoAliado = document.querySelector('.mao-aliado');
+
+        bancoDeCartasAliadas.forEach(cartaDado => {
+            let cartaElemento = document.createElement('div');
+            cartaElemento.classList.add('carta');
+            cartaElemento.style.backgroundImage = `url(${cartaDado.img})`;
+            
+            cartaElemento.addEventListener('click', () => {
+                alert("Você clicou na carta aliada: " + cartaDado.nome + " com força " + cartaDado.forca);
+            });
+
+            cartaElemento.setAttribute('draggable', 'true');
+
+            cartaElemento.addEventListener('dragstart', (evento) => {
+                cartaElemento.classList.add('segurando');
+                evento.dataTransfer.setData('text/plain', cartaDado.forca);
+            });
+
+            cartaElemento.addEventListener('dragend', () => {
+                cartaElemento.classList.remove('segurando');
+            });
+
+            maoAliado.appendChild(cartaElemento);
+        });
+
+        const maoInimigo = document.querySelector('.mao-inimigo');
+
+        bancoDeCartasInimigas.forEach(cartaDado => {
+            let cartaElemento = document.createElement('div');
+            cartaElemento.classList.add('carta');
+            cartaElemento.classList.add('inimigo');
+            cartaElemento.style.backgroundImage = `url(${cartaDado.img})`;
+            
+            cartaElemento.addEventListener('click', () => {
+                alert("Você clicou na carta inimiga: " + cartaDado.nome + " com força " + cartaDado.forca);
+            });
+
+            maoInimigo.appendChild(cartaElemento);
+        });
+
+        const slotsMesa = document.querySelectorAll('.slot');
+
+        slotsMesa.forEach(slot => {
+            slot.addEventListener('dragover', (evento) => {
+                evento.preventDefault(); 
+                slot.style.backgroundColor = '#4CAF50'; 
+            });
+
+            slot.addEventListener('dragleave', () => {
+                slot.style.backgroundColor = '#1b263b'; 
+            });
+
+            slot.addEventListener('drop', (evento) => {
+                evento.preventDefault();
+                slot.style.backgroundColor = '#1b263b';
+                
+                const cartaSegurada = document.querySelector('.segurando');
+                
+                if(slot.children.length === 0 && cartaSegurada) {
+                    slot.innerText = '';
+                    slot.appendChild(cartaSegurada);
+                    cartaSegurada.setAttribute('draggable', 'false');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
